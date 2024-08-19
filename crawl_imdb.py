@@ -41,16 +41,18 @@ def get_imdb_titles(url):
         
         return imdb_titles
 
-imdb_titles = {'Movies' : "https://www.imdb.com/search/title/?title_type=feature&countries=IN",
+imdb_titles = {
+                'Movies' : "https://www.imdb.com/search/title/?title_type=feature&countries=IN",
                'Series' : "https://www.imdb.com/search/title/?title_type=tv_series&countries=IN",
                'Netflix India' : "https://www.imdb.com/search/title/?title_type=feature,tv_series&companies=co0944055",
                'Prime Video' : "https://www.imdb.com/search/title/?title_type=feature,tv_series&companies=co0939864",
                "Disney Plus Hotstar" : "https://www.imdb.com/search/title/?title_type=feature,tv_series&companies=co0847080",
                'Jio Cinema' : "https://www.imdb.com/search/title/?title_type=feature,tv_series&companies=co0808044",
                'Zee5' : 'https://www.imdb.com/search/title/?title_type=feature,tv_series&companies=co0692549',
-               'Sony Liv' : 'https://www.imdb.com/search/title/?title_type=feature,tv_series&companies=co0546496'}
+               'Sony Liv' : 'https://www.imdb.com/search/title/?title_type=feature,tv_series&companies=co0546496'
+               }
 
-types = [x for x in imdb_titles] 
+types = [x for x in imdb_titles]
 urls = [imdb_titles[x] for x in imdb_titles]
 
 with futures.ThreadPoolExecutor(max_workers=4) as executor: # default/optimized number of threads

@@ -10,9 +10,15 @@ METAHUB_URL = 'https://images.metahub.space/poster/medium/{}/img'
 
 waitS = 5
 
+options = webdriver.ChromeOptions()
+options.add_argument('--no-sandbox')
+options.add_argument('--headless')
+options.add_argument('--disable-gpu')
+options.add_argument('--disable-dev-shm-usage')
+options.add_argument("--window-size=700,700")
+
 def get_imdb_titles(url):
     with webdriver.Chrome() as driver:
-        driver.set_window_size(700, 700)
         driver.get(url)
         actions = ActionChains(driver)
 
@@ -42,8 +48,9 @@ def get_imdb_titles(url):
         return imdb_titles
 
 imdb_titles = {
-                'Movies' : "https://www.imdb.com/search/title/?title_type=feature&countries=IN",
-               'Series' : "https://www.imdb.com/search/title/?title_type=tv_series&countries=IN",
+                'Top Rated' : "https://www.imdb.com/search/title/?title_type=feature&user_rating=7,10&country_of_origin=IN",
+                'Movies' : "https://www.imdb.com/search/title/?title_type=feature&country_of_origin=IN",
+               'Series' : "https://www.imdb.com/search/title/?title_type=tv_series&country_of_origin=IN",
                'Netflix India' : "https://www.imdb.com/search/title/?title_type=feature,tv_series&companies=co0944055",
                'Prime Video' : "https://www.imdb.com/search/title/?title_type=feature,tv_series&companies=co0939864",
                "Disney Plus Hotstar" : "https://www.imdb.com/search/title/?title_type=feature,tv_series&companies=co0847080",

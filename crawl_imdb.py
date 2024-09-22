@@ -70,9 +70,9 @@ imdb_dict = {}
 
 for i in range(len(title_res)):
     if types[i] == 'Top Rated':
-        imdb_dict[types[i]] = random.shuffle(title_res[i])
-    else:
-        imdb_dict[types[i]] = title_res[i]
+        random.shuffle(title_res[i])
+    
+    imdb_dict[types[i]] = title_res[i]
 
 with open('data.json', 'w') as f:
     json.dump(imdb_dict, f)

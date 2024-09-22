@@ -5,6 +5,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from concurrent import futures
+import random
 
 METAHUB_URL = 'https://images.metahub.space/poster/medium/{}/img'
 
@@ -17,7 +18,7 @@ options.add_argument('--disable-gpu')
 options.add_argument('--disable-dev-shm-usage')
 options.add_argument("--window-size=700,700")
 
-def get_imdb_titles(url):
+def get_imdb_titles(url, loop=40):
     with webdriver.Chrome() as driver:
         driver.get(url)
         actions = ActionChains(driver)
@@ -27,7 +28,7 @@ def get_imdb_titles(url):
         xpath_title = ".//*[@class='ipc-lockup-overlay ipc-focusable']"
         xpath_type = ".//span[contains(text(), 'TV Series')]"
 
-        for i in range(20):
+        for i in range(loop):
 
             try:
                 WebDriverWait(driver, waitS).until(EC.presence_of_element_located((By.XPATH, xpath_next)))
@@ -50,13 +51,13 @@ def get_imdb_titles(url):
 imdb_titles = {
                 'Top Rated' : "https://www.imdb.com/search/title/?title_type=feature&user_rating=7,10&country_of_origin=IN",
                 'Movies' : "https://www.imdb.com/search/title/?title_type=feature&country_of_origin=IN",
-               'Series' : "https://www.imdb.com/search/title/?title_type=tv_series&country_of_origin=IN",
-               'Netflix India' : "https://www.imdb.com/search/title/?title_type=feature,tv_series&companies=co0944055",
-               'Prime Video' : "https://www.imdb.com/search/title/?title_type=feature,tv_series&companies=co0939864",
-               "Disney Plus Hotstar" : "https://www.imdb.com/search/title/?title_type=feature,tv_series&companies=co0847080",
-               'Jio Cinema' : "https://www.imdb.com/search/title/?title_type=feature,tv_series&companies=co0808044",
-               'Zee5' : 'https://www.imdb.com/search/title/?title_type=feature,tv_series&companies=co0692549',
-               'Sony Liv' : 'https://www.imdb.com/search/title/?title_type=feature,tv_series&companies=co0546496'
+                'Series' : "https://www.imdb.com/search/title/?title_type=tv_series&country_of_origin=IN",
+                'Netflix India' : "https://www.imdb.com/search/title/?title_type=feature,tv_series&companies=co0944055",
+                'Prime Video' : "https://www.imdb.com/search/title/?title_type=feature,tv_series&companies=co0939864",
+                "Disney Plus Hotstar" : "https://www.imdb.com/search/title/?title_type=feature,tv_series&companies=co0847080",
+                'Jio Cinema' : "https://www.imdb.com/search/title/?title_type=feature,tv_series&companies=co0808044",
+                'Zee5' : 'https://www.imdb.com/search/title/?title_type=feature,tv_series&companies=co0692549',
+                'Sony Liv' : 'https://www.imdb.com/search/title/?title_type=feature,tv_series&companies=co0546496'
                }
 
 types = [x for x in imdb_titles]
@@ -68,7 +69,10 @@ with futures.ThreadPoolExecutor(max_workers=4) as executor: # default/optimized 
 imdb_dict = {}
 
 for i in range(len(title_res)):
-    imdb_dict[types[i]] = title_res[i]
+    if types[i] == 'Top Rated':
+        imdb_dict[types[i]] = random.shuffle(title_res[i])
+    else:
+        imdb_dict[types[i]] = title_res[i]
 
 with open('data.json', 'w') as f:
     json.dump(imdb_dict, f)

@@ -49,7 +49,7 @@ def get_imdb_titles(url, loop=40):
         return imdb_titles
 
 imdb_titles = {
-                'Top Rated' : "https://www.imdb.com/search/title/?title_type=feature&user_rating=7,10&num_votes=2000,&country_of_origin=IN",
+                'Top Rated' : "https://www.imdb.com/search/title/?title_type=feature&user_rating=5,10&num_votes=2000,&country_of_origin=IN",
                 'Movies' : "https://www.imdb.com/search/title/?title_type=feature&country_of_origin=IN",
                 'Series' : "https://www.imdb.com/search/title/?title_type=tv_series&country_of_origin=IN",
                 'Netflix India' : "https://www.imdb.com/search/title/?title_type=feature,tv_series&companies=co0944055",

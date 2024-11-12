@@ -58,8 +58,8 @@ def get_imdb_full(url):
         xpath_title = ".//*[@class='ipc-lockup-overlay ipc-focusable']"
         xpath_type = ".//span[contains(text(), 'TV Series')]"
 
-        #while True:
-        for i in range(5):
+        while True:
+        #for i in range(5):
             try:
                 WebDriverWait(driver, waitS).until(EC.presence_of_element_located((By.XPATH, xpath_next)))
             except:

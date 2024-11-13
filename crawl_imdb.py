@@ -18,6 +18,9 @@ options.add_argument('--disable-gpu')
 options.add_argument('--disable-dev-shm-usage')
 options.add_argument("--window-size=700,700")
 
+year_filter='&release_date={}-01-01,{}-12-31'
+hindi_filter = '&languages=hi'
+
 def get_imdb_titles(url, loop=40):
     with webdriver.Chrome() as driver:
         driver.get(url)
@@ -48,38 +51,40 @@ def get_imdb_titles(url, loop=40):
         
         return imdb_titles
 
-def get_imdb_full(url):
+def get_imdb_full(url, year_step=5):
     with webdriver.Chrome() as driver:
-        driver.get(url)
-        actions = ActionChains(driver)
+        imdb_full = []
+        for year in range(1990, 2025, year_step):
+            driver.get(url+year_filter.format(year, year+year_step-1))
+            actions = ActionChains(driver)
 
-        xpath_next = "//span[@class='ipc-see-more__text']"
-        xpath_imdb_elements = "//*[@class='ipc-metadata-list-summary-item__tc']"
-        xpath_title = ".//*[@class='ipc-lockup-overlay ipc-focusable']"
-        xpath_type = ".//span[contains(text(), 'TV Series')]"
+            xpath_next = "//span[@class='ipc-see-more__text']"
+            xpath_imdb_elements = "//*[@class='ipc-metadata-list-summary-item__tc']"
+            xpath_title = ".//*[@class='ipc-lockup-overlay ipc-focusable']"
+            xpath_type = ".//span[contains(text(), 'TV Series')]"
 
-        while True:
-        #for i in range(5):
-            try:
-                WebDriverWait(driver, waitS).until(EC.presence_of_element_located((By.XPATH, xpath_next)))
-            except:
-                driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-                break
+            while True:
+            #for i in range(5):
+                try:
+                    WebDriverWait(driver, waitS).until(EC.presence_of_element_located((By.XPATH, xpath_next)))
+                except:
+                    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                    break
 
-            next_ele = WebDriverWait(driver, waitS).until(EC.presence_of_element_located((By.XPATH, xpath_next)))
-            actions.move_to_element(next_ele).perform()
-            next_ele = WebDriverWait(driver, waitS).until(EC.presence_of_element_located((By.XPATH, xpath_next)))
-            next_ele.click()
-        imdb_full = [{"id" :  x.find_element(By.XPATH, xpath_title).get_property("href").split("/")[4], 
-                        "type" : 'movie' if len(x.find_elements(By.XPATH, xpath_type))==0 else 'series', 
-                        'title' : x.find_element(By.XPATH, ".//*[@class='ipc-title__text']").text.split(". ",1)[1],
-                        'year' : x.find_element(By.XPATH, ".//div/div/div[2]/div/span[1]").text,
-                        #'rtime' : x.find_element(By.XPATH, ".//div/div/div[2]/div/span[2]").text,
-                        'rating' : x.find_element(By.XPATH, ".//*[@class='ipc-rating-star--rating']").text,
-                        'votes' : x.find_element(By.XPATH, ".//*[@class='ipc-rating-star--voteCount']").text,
-                        #'descr' : x.find_element(By.XPATH, ".//div/div[2]/div/div").text,
-                        } 
-                        for x in driver.find_elements(By.XPATH, xpath_imdb_elements)]
+                next_ele = WebDriverWait(driver, waitS).until(EC.presence_of_element_located((By.XPATH, xpath_next)))
+                actions.move_to_element(next_ele).perform()
+                next_ele = WebDriverWait(driver, waitS).until(EC.presence_of_element_located((By.XPATH, xpath_next)))
+                next_ele.click()
+            imdb_full.extend([{"id" :  x.find_element(By.XPATH, xpath_title).get_property("href").split("/")[4], 
+                            "type" : 'movie' if len(x.find_elements(By.XPATH, xpath_type))==0 else 'series', 
+                            'title' : x.find_element(By.XPATH, ".//*[@class='ipc-title__text']").text.split(". ",1)[1],
+                            'year' : x.find_element(By.XPATH, ".//div/div/div[2]/div/span[1]").text,
+                            #'rtime' : x.find_element(By.XPATH, ".//div/div/div[2]/div/span[2]").text,
+                            'rating' : x.find_element(By.XPATH, ".//*[@class='ipc-rating-star--rating']").text,
+                            'votes' : x.find_element(By.XPATH, ".//*[@class='ipc-rating-star--voteCount']").text,
+                            #'descr' : x.find_element(By.XPATH, ".//div/div[2]/div/div").text,
+                            } 
+                            for x in driver.find_elements(By.XPATH, xpath_imdb_elements)])
         
         return imdb_full
 
@@ -115,7 +120,7 @@ imdb_dict = {}
 for i in range(len(title_res)):
     imdb_dict[types[i]] = title_res[i]
 
-with open('data.json', 'w') as f:
+with open('data1.json', 'w') as f:
     json.dump(imdb_dict | full_imdb_dict, f)
 
 print("Completed")

@@ -120,7 +120,7 @@ imdb_dict = {}
 for i in range(len(title_res)):
     imdb_dict[types[i]] = title_res[i]
 
-with open('data1.json', 'w') as f:
+with open('data.json', 'w') as f:
     json.dump(imdb_dict | full_imdb_dict, f)
 
 print("Completed")

@@ -51,7 +51,7 @@ def get_imdb_titles(url, loop=40):
         
         return imdb_titles
 
-def get_imdb_full(url, year_step=5):
+def get_imdb_full(url, year_step=10):
     with webdriver.Chrome() as driver:
         imdb_full = []
         for year in range(1990, 2025, year_step):

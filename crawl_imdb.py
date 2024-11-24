@@ -112,8 +112,8 @@ imdb_urls = {
     "Hindi Language" : "https://www.imdb.com/search/title/?title_type=feature,tv_series&primary_language=hi"
     }
 
+full_imdb_dict = {}
 for key in imdb_urls.keys():
-    full_imdb_dict = {}
     full_imdb_dict[key] = get_imdb_full(imdb_urls[key])
 
 print(full_imdb_dict.keys())

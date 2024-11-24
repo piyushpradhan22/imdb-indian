@@ -75,16 +75,34 @@ def get_imdb_full(url, year_step=10):
                 actions.move_to_element(next_ele).perform()
                 next_ele = WebDriverWait(driver, waitS).until(EC.presence_of_element_located((By.XPATH, xpath_next)))
                 next_ele.click()
-            imdb_full.extend([{"id" :  x.find_element(By.XPATH, xpath_title).get_property("href").split("/")[4], 
-                            "type" : 'movie' if len(x.find_elements(By.XPATH, xpath_type))==0 else 'series', 
-                            'title' : x.find_element(By.XPATH, ".//*[@class='ipc-title__text']").text.split(". ",1)[1],
-                            'year' : x.find_element(By.XPATH, ".//div/div/div[2]/div/span[1]").text,
-                            #'rtime' : x.find_element(By.XPATH, ".//div/div/div[2]/div/span[2]").text,
-                            'rating' : x.find_element(By.XPATH, ".//*[@class='ipc-rating-star--rating']").text,
-                            'votes' : x.find_element(By.XPATH, ".//*[@class='ipc-rating-star--voteCount']").text,
-                            #'descr' : x.find_element(By.XPATH, ".//div/div[2]/div/div").text,
-                            } 
-                            for x in driver.find_elements(By.XPATH, xpath_imdb_elements)])
+            for x in driver.find_elements(By.XPATH, xpath_imdb_elements):
+                data = {}
+                data["id"] =  x.find_element(By.XPATH, xpath_title).get_property("href").split("/")[4]
+
+                data["type"] = 'movie' if len(x.find_elements(By.XPATH, xpath_type))==0 else 'series'
+                data['title'] = x.find_element(By.XPATH, ".//*[@class='ipc-title__text']").text.split(". ",1)[1]
+                if len(x.find_elements(By.XPATH, ".//div/div/div[2]/div/span[1]")) > 0:
+                    data['year'] = x.find_element(By.XPATH, ".//div/div/div[2]/div/span[1]").text
+                else:
+                    data['year'] = '0'
+                if len(x.find_elements(By.XPATH, ".//div/div/div[2]/div/span[2]")) > 0:
+                    data['rtime'] = x.find_element(By.XPATH, ".//div/div/div[2]/div/span[2]").text
+                else:
+                    data['rtime'] = '0h 0m'
+                if len(x.find_elements(By.XPATH, ".//*[@class='ipc-rating-star--rating']")) > 0:
+                    data['rating'] = x.find_element(By.XPATH, ".//*[@class='ipc-rating-star--rating']").text
+                else:
+                    data['rating'] = '0'
+                if len(x.find_elements(By.XPATH, ".//*[@class='ipc-rating-star--voteCount']")) > 0:
+                    data['votes'] = x.find_element(By.XPATH, ".//*[@class='ipc-rating-star--voteCount']").text
+                else:
+                    data['votes'] = '0'
+                if len(x.find_elements(By.XPATH, ".//div/div[2]/div/div")) > 0:
+                    data['descr'] = x.find_element(By.XPATH, ".//div/div[2]/div/div").text
+                else:
+                    data['descr'] = ''
+                
+                imdb_full.append(data)
         
         return imdb_full
 
@@ -93,8 +111,10 @@ imdb_urls = {
     "Indian Movies" : "https://www.imdb.com/search/title/?title_type=feature&num_votes=1000,&country_of_origin=IN",
     "Hindi Language" : "https://www.imdb.com/search/title/?title_type=feature,tv_series&primary_language=hi"
     }
+
 for key in imdb_urls.keys():
-    full_imdb_dict = {key : get_imdb_full(imdb_urls[key])}
+    full_imdb_dict = {}
+    full_imdb_dict[key] = get_imdb_full(imdb_urls[key])
 
 print(full_imdb_dict.keys())
 

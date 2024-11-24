@@ -91,9 +91,10 @@ def get_imdb_full(url, year_step=5):
 ### IMDB Full Details
 imdb_urls = {
     "Indian Movies" : "https://www.imdb.com/search/title/?title_type=feature&num_votes=1000,&country_of_origin=IN",
+    "Hindi Language" : "https://www.imdb.com/search/title/?title_type=feature,tv_series&primary_language=hi"
     }
 for key in imdb_urls.keys():
-    full_imdb_dict = {key : get_imdb_full("https://www.imdb.com/search/title/?title_type=feature&num_votes=1000,&country_of_origin=IN")}
+    full_imdb_dict = {key : get_imdb_full(imdb_urls[key])}
 
 print(full_imdb_dict.keys())
 

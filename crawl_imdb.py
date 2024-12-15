@@ -44,12 +44,42 @@ def get_imdb_titles(url, loop=40):
             next_ele = WebDriverWait(driver, waitS).until(EC.presence_of_element_located((By.XPATH, xpath_next)))
             next_ele.click()
 
-        imdb_titles = [{"id" :  x.find_element(By.XPATH, xpath_title).get_property("href").split("/")[4], 
-                        "type" : 'movie' if len(x.find_elements(By.XPATH, xpath_type))==0 else 'series', 
-                        'poster' : METAHUB_URL.format(x.find_element(By.XPATH, xpath_title).get_property("href").split("/")[4])} 
-                        for x in driver.find_elements(By.XPATH, xpath_imdb_elements)]
-        
-        return imdb_titles
+        # imdb_titles = [{"id" :  x.find_element(By.XPATH, xpath_title).get_property("href").split("/")[4], 
+        #                 "type" : 'movie' if len(x.find_elements(By.XPATH, xpath_type))==0 else 'series', 
+        #                 'poster' : METAHUB_URL.format(x.find_element(By.XPATH, xpath_title).get_property("href").split("/")[4])} 
+        #                 for x in driver.find_elements(By.XPATH, xpath_imdb_elements)]
+
+        imdb_full = []
+        for x in driver.find_elements(By.XPATH, xpath_imdb_elements):
+                data = {}
+                data["id"] =  x.find_element(By.XPATH, xpath_title).get_property("href").split("/")[4]
+                data["type"] = 'movie' if len(x.find_elements(By.XPATH, xpath_type))==0 else 'series'
+                data['poster'] = METAHUB_URL.format(x.find_element(By.XPATH, xpath_title).get_property("href").split("/")[4])
+                data['title'] = x.find_element(By.XPATH, ".//*[@class='ipc-title__text']").text.split(". ",1)[1]
+                if len(x.find_elements(By.XPATH, ".//div/div/div[2]/div/span[1]")) > 0:
+                    data['year'] = x.find_element(By.XPATH, ".//div/div/div[2]/div/span[1]").text
+                else:
+                    data['year'] = '0'
+                if len(x.find_elements(By.XPATH, ".//div/div/div[2]/div/span[2]")) > 0:
+                    data['rtime'] = x.find_element(By.XPATH, ".//div/div/div[2]/div/span[2]").text
+                else:
+                    data['rtime'] = '0h 0m'
+                if len(x.find_elements(By.XPATH, ".//*[@class='ipc-rating-star--rating']")) > 0:
+                    data['rating'] = x.find_element(By.XPATH, ".//*[@class='ipc-rating-star--rating']").text
+                else:
+                    data['rating'] = '0'
+                if len(x.find_elements(By.XPATH, ".//*[@class='ipc-rating-star--voteCount']")) > 0:
+                    data['votes'] = x.find_element(By.XPATH, ".//*[@class='ipc-rating-star--voteCount']").text
+                else:
+                    data['votes'] = '0'
+                if len(x.find_elements(By.XPATH, ".//div/div[2]/div/div")) > 0:
+                    data['descr'] = x.find_element(By.XPATH, ".//div/div[2]/div/div").text
+                else:
+                    data['descr'] = ''
+                
+                imdb_full.append(data)
+
+        return imdb_full
 
 def get_imdb_full(url, year_step=2):
     with webdriver.Chrome() as driver:

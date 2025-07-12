@@ -110,7 +110,7 @@ def get_imdb_full(url, year_step=2):
                 data["id"] =  x.find_element(By.XPATH, xpath_title).get_property("href").split("/")[4]
 
                 data["type"] = 'movie' if len(x.find_elements(By.XPATH, xpath_type))==0 else 'series'
-                data['title'] = x.find_element(By.XPATH, ".//*[@class='ipc-title__text']").text.split(". ",1)[1]
+                data['title'] = x.find_element(By.XPATH, "//*[@class='ipc-metadata-list-summary-item__tc']/div/div/div[2]/div[1]").text.split(". ",1)[1]
                 if len(x.find_elements(By.XPATH, ".//div/div/div[2]/div/span[1]")) > 0:
                     data['year'] = x.find_element(By.XPATH, ".//div/div/div[2]/div/span[1]").text
                 else:

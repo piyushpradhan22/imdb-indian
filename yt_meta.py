@@ -77,7 +77,7 @@ def update_data_with_youtube_links():
     with ThreadPoolExecutor() as executor:
         for keys in data.keys():
             # Process movies and get YouTube info
-            updated_movies = list(executor.map(get_youtube_info, data[keys][:2]))
+            updated_movies = list(executor.map(get_youtube_info, data[keys]))
             
             # Transform to new structure
             for movie in updated_movies:

@@ -1,0 +1,44 @@
+name: YouTube Metadata Update
+
+on:
+  workflow_dispatch:  # Manual trigger
+  workflow_run:
+    workflows: ["Pull from imdb"]
+    types:
+      - completed
+    branches:
+      - master
+
+jobs:
+  update-yt-metadata:
+    runs-on: ubuntu-latest
+    # Only run if the previous workflow succeeded (when triggered by workflow_run)
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    timeout-minutes: 60
+    steps:
+        
+      - name: checkout repo content
+        uses: actions/checkout@v2
+        with:
+          ref: master  # Ensure we're on the latest master after crawl_imdb updates
+
+      - name: setup python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          
+      - name: install python packages
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          
+      - name: execute yt_meta script
+        run: python -u yt_meta.py
+        
+      - name: Commit YouTube Metadata
+        run: |
+          git config --global user.name 'Piyush Pradhan'
+          git config --global user.email 'piyushpradhan22@users.noreply.github.com'
+          git add .
+          git diff --staged --quiet || git commit -m "Automated YouTube Metadata Update"
+          git push

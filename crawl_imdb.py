@@ -5,7 +5,6 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from concurrent import futures
-import random
 
 METAHUB_URL = 'https://images.metahub.space/poster/medium/{}/img'
 
@@ -55,7 +54,7 @@ def get_imdb_titles(url, loop=40):
                 data["id"] =  f"o{x.find_element(By.XPATH, xpath_title).get_property('href').split('/')[4]}"
                 data["type"] = 'movie' if len(x.find_elements(By.XPATH, xpath_type))==0 else 'series'
                 data['poster'] = METAHUB_URL.format(x.find_element(By.XPATH, xpath_title).get_property("href").split("/")[4])
-                data['name'] = x.find_element(By.XPATH, "//*[@class='ipc-metadata-list-summary-item__tc']/div/div/div[2]/div[1]").text.split(". ",1)[1]
+                data['name'] = x.find_element(By.XPATH, ".//*[@class='ipc-title__text ipc-title__text--reduced']").text.split(". ",1)[1]
                 if len(x.find_elements(By.XPATH, ".//div/div/div[2]/div/span[1]")) > 0:
                     data['year'] = x.find_element(By.XPATH, ".//div/div/div[2]/div/span[1]").text
                 else:
@@ -109,7 +108,7 @@ def get_imdb_full(url, year_step=2):
                 data["id"] =  f"o{x.find_element(By.XPATH, xpath_title).get_property('href').split('/')[4]}"
 
                 data["type"] = 'movie' if len(x.find_elements(By.XPATH, xpath_type))==0 else 'series'
-                data['name'] = x.find_element(By.XPATH, "//*[@class='ipc-metadata-list-summary-item__tc']/div/div/div[2]/div[1]").text.split(". ",1)[1]
+                data['name'] = x.find_element(By.XPATH, ".//*[@class='ipc-title__text ipc-title__text--reduced']").text.split(". ",1)[1]
                 if len(x.find_elements(By.XPATH, ".//div/div/div[2]/div/span[1]")) > 0:
                     data['year'] = x.find_element(By.XPATH, ".//div/div/div[2]/div/span[1]").text
                 else:

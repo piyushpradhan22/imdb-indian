@@ -52,7 +52,7 @@ def get_imdb_titles(url, loop=40):
         imdb_full = []
         for x in driver.find_elements(By.XPATH, xpath_imdb_elements):
                 data = {}
-                data["id"] =  x.find_element(By.XPATH, xpath_title).get_property("href").split("/")[4]
+                data["id"] =  f"o{x.find_element(By.XPATH, xpath_title).get_property('href').split('/')[4]}"
                 data["type"] = 'movie' if len(x.find_elements(By.XPATH, xpath_type))==0 else 'series'
                 data['poster'] = METAHUB_URL.format(x.find_element(By.XPATH, xpath_title).get_property("href").split("/")[4])
                 data['name'] = x.find_element(By.XPATH, "//*[@class='ipc-metadata-list-summary-item__tc']/div/div/div[2]/div[1]").text.split(". ",1)[1]
@@ -106,7 +106,7 @@ def get_imdb_full(url, year_step=2):
                 next_ele.click()
             for x in driver.find_elements(By.XPATH, xpath_imdb_elements):
                 data = {}
-                data["id"] =  x.find_element(By.XPATH, xpath_title).get_property("href").split("/")[4]
+                data["id"] =  f"o{x.find_element(By.XPATH, xpath_title).get_property('href').split('/')[4]}"
 
                 data["type"] = 'movie' if len(x.find_elements(By.XPATH, xpath_type))==0 else 'series'
                 data['name'] = x.find_element(By.XPATH, "//*[@class='ipc-metadata-list-summary-item__tc']/div/div/div[2]/div[1]").text.split(". ",1)[1]

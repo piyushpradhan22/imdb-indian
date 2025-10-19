@@ -55,28 +55,27 @@ def get_imdb_titles(url, loop=40):
                 data["id"] =  x.find_element(By.XPATH, xpath_title).get_property("href").split("/")[4]
                 data["type"] = 'movie' if len(x.find_elements(By.XPATH, xpath_type))==0 else 'series'
                 data['poster'] = METAHUB_URL.format(x.find_element(By.XPATH, xpath_title).get_property("href").split("/")[4])
-                data['title'] = x.find_element(By.XPATH, "//*[@class='ipc-metadata-list-summary-item__tc']/div/div/div[2]/div[1]").text.split(". ",1)[1]
+                data['name'] = x.find_element(By.XPATH, "//*[@class='ipc-metadata-list-summary-item__tc']/div/div/div[2]/div[1]").text.split(". ",1)[1]
                 if len(x.find_elements(By.XPATH, ".//div/div/div[2]/div/span[1]")) > 0:
                     data['year'] = x.find_element(By.XPATH, ".//div/div/div[2]/div/span[1]").text
                 else:
                     data['year'] = '0'
                 if len(x.find_elements(By.XPATH, ".//div/div/div[2]/div/span[2]")) > 0:
-                    data['rtime'] = x.find_element(By.XPATH, ".//div/div/div[2]/div/span[2]").text
+                    data['runtime'] = x.find_element(By.XPATH, ".//div/div/div[2]/div/span[2]").text
                 else:
-                    data['rtime'] = '0h 0m'
+                    data['runtime'] = '0h 0m'
                 if len(x.find_elements(By.XPATH, ".//*[@class='ipc-rating-star--rating']")) > 0:
-                    data['rating'] = x.find_element(By.XPATH, ".//*[@class='ipc-rating-star--rating']").text
+                    data['imdbRating'] = x.find_element(By.XPATH, ".//*[@class='ipc-rating-star--rating']").text
                 else:
-                    data['rating'] = '0'
+                    data['imdbRating'] = '0'
                 if len(x.find_elements(By.XPATH, ".//*[@class='ipc-rating-star--voteCount']")) > 0:
                     data['votes'] = x.find_element(By.XPATH, ".//*[@class='ipc-rating-star--voteCount']").text
                 else:
                     data['votes'] = '0'
                 if len(x.find_elements(By.XPATH, ".//div/div[2]/div/div")) > 0:
-                    data['descr'] = x.find_element(By.XPATH, ".//div/div[2]/div/div").text
+                    data['description'] = x.find_element(By.XPATH, ".//div/div[2]/div/div").text
                 else:
-                    data['descr'] = ''
-                
+                    data['description'] = ''
                 imdb_full.append(data)
 
         return imdb_full
@@ -110,28 +109,28 @@ def get_imdb_full(url, year_step=2):
                 data["id"] =  x.find_element(By.XPATH, xpath_title).get_property("href").split("/")[4]
 
                 data["type"] = 'movie' if len(x.find_elements(By.XPATH, xpath_type))==0 else 'series'
-                data['title'] = x.find_element(By.XPATH, "//*[@class='ipc-metadata-list-summary-item__tc']/div/div/div[2]/div[1]").text.split(". ",1)[1]
+                data['name'] = x.find_element(By.XPATH, "//*[@class='ipc-metadata-list-summary-item__tc']/div/div/div[2]/div[1]").text.split(". ",1)[1]
                 if len(x.find_elements(By.XPATH, ".//div/div/div[2]/div/span[1]")) > 0:
                     data['year'] = x.find_element(By.XPATH, ".//div/div/div[2]/div/span[1]").text
                 else:
                     data['year'] = '0'
                 if len(x.find_elements(By.XPATH, ".//div/div/div[2]/div/span[2]")) > 0:
-                    data['rtime'] = x.find_element(By.XPATH, ".//div/div/div[2]/div/span[2]").text
+                    data['runtime'] = x.find_element(By.XPATH, ".//div/div/div[2]/div/span[2]").text
                 else:
-                    data['rtime'] = '0h 0m'
+                    data['runtime'] = '0h 0m'
                 if len(x.find_elements(By.XPATH, ".//*[@class='ipc-rating-star--rating']")) > 0:
-                    data['rating'] = x.find_element(By.XPATH, ".//*[@class='ipc-rating-star--rating']").text
+                    data['imdbRating'] = x.find_element(By.XPATH, ".//*[@class='ipc-rating-star--rating']").text
                 else:
-                    data['rating'] = '0'
+                    data['imdbRating'] = '0'
                 if len(x.find_elements(By.XPATH, ".//*[@class='ipc-rating-star--voteCount']")) > 0:
                     data['votes'] = x.find_element(By.XPATH, ".//*[@class='ipc-rating-star--voteCount']").text
                 else:
                     data['votes'] = '0'
                 if len(x.find_elements(By.XPATH, ".//div/div[2]/div/div")) > 0:
-                    data['descr'] = x.find_element(By.XPATH, ".//div/div[2]/div/div").text
+                    data['description'] = x.find_element(By.XPATH, ".//div/div[2]/div/div").text
                 else:
-                    data['descr'] = ''
-                
+                    data['description'] = ''
+
                 imdb_full.append(data)
         
         return imdb_full

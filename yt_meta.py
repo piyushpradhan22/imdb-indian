@@ -55,7 +55,7 @@ def YoutubeSearch(query, max_results=5):
     return results
 
 def get_youtube_info(x):
-    query = f"{x.get('name')} {x.get('year')[:4]} trailer"
+    query = f"{x.get('name')} {x.get('year')[:4]} trailer hindi"
     result = YoutubeSearch(query, max_results=1)
     
     if result:

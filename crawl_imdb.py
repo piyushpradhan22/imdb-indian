@@ -56,9 +56,9 @@ def get_imdb_titles(url, loop=40):
                 data['poster'] = METAHUB_URL.format(x.find_element(By.XPATH, xpath_title).get_property("href").split("/")[4])
                 data['name'] = x.find_element(By.XPATH, ".//*[@class='ipc-title__text ipc-title__text--reduced']").text.split(". ",1)[1]
                 if len(x.find_elements(By.XPATH, ".//div/div/div[2]/div/span[1]")) > 0:
-                    data['year'] = x.find_element(By.XPATH, ".//div/div/div[2]/div/span[1]").text
+                    data['releaseInfo'] = x.find_element(By.XPATH, ".//div/div/div[2]/div/span[1]").text
                 else:
-                    data['year'] = '0'
+                    data['releaseInfo'] = '0'
                 if len(x.find_elements(By.XPATH, ".//div/div/div[2]/div/span[2]")) > 0:
                     data['runtime'] = x.find_element(By.XPATH, ".//div/div/div[2]/div/span[2]").text
                 else:
@@ -110,9 +110,9 @@ def get_imdb_full(url, year_step=2):
                 data["type"] = 'movie' if len(x.find_elements(By.XPATH, xpath_type))==0 else 'series'
                 data['name'] = x.find_element(By.XPATH, ".//*[@class='ipc-title__text ipc-title__text--reduced']").text.split(". ",1)[1]
                 if len(x.find_elements(By.XPATH, ".//div/div/div[2]/div/span[1]")) > 0:
-                    data['year'] = x.find_element(By.XPATH, ".//div/div/div[2]/div/span[1]").text
+                    data['releaseInfo'] = x.find_element(By.XPATH, ".//div/div/div[2]/div/span[1]").text
                 else:
-                    data['year'] = '0'
+                    data['releaseInfo'] = '0'
                 if len(x.find_elements(By.XPATH, ".//div/div/div[2]/div/span[2]")) > 0:
                     data['runtime'] = x.find_element(By.XPATH, ".//div/div/div[2]/div/span[2]").text
                 else:

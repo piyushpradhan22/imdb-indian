@@ -1,7 +1,7 @@
 import requests
 
 try:
-    requests.get("https://hellopiyush0003-stremio.hf.space/tor/catalog/Indian/TORRENT.json").json()
+    requests.get("https://dekibov972-stremio.hf.space/tor/catalog/Indian/TORRENT.json").json()
     print("Stremio is running Well")
 except Exception as e:
     print(f"Stremio request failed: {e}")

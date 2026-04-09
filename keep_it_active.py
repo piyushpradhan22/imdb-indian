@@ -6,7 +6,7 @@ try:
 except Exception as e:
     print(f"Stremio request failed: {e}")
 try:
-    response = requests.get("https://hellopiyush0003-qb.hf.space/")
+    response = requests.get("https://reinkingkrauszwvrx10571733757044-qb.hf.space/")
     if 'content="qBittorrent WebUI' in response.text:
         print("QB is running Well")
     else:

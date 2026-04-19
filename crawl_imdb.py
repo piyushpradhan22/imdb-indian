@@ -27,8 +27,8 @@ def get_imdb_titles(url, loop=40):
 
         xpath_next = "//span[@class='ipc-see-more__text']"
         xpath_imdb_elements = "//*[@class='ipc-metadata-list-summary-item__tc']"
-        xpath_title = ".//*[@class='ipc-lockup-overlay ipc-focusable']"
-        xpath_type = ".//span[contains(text(), 'TV Series')]"
+        xpath_title = ".//a[contains(@href, '/title/')]"
+        xpath_type = ".//span[contains(text(), 'TV Series')]"  # Keep for now
 
         for i in range(loop):
 
@@ -43,18 +43,14 @@ def get_imdb_titles(url, loop=40):
             next_ele = WebDriverWait(driver, waitS).until(EC.presence_of_element_located((By.XPATH, xpath_next)))
             next_ele.click()
 
-        # imdb_titles = [{"id" :  x.find_element(By.XPATH, xpath_title).get_property("href").split("/")[4], 
-        #                 "type" : 'movie' if len(x.find_elements(By.XPATH, xpath_type))==0 else 'series', 
-        #                 'poster' : METAHUB_URL.format(x.find_element(By.XPATH, xpath_title).get_property("href").split("/")[4])} 
-        #                 for x in driver.find_elements(By.XPATH, xpath_imdb_elements)]
-
         imdb_full = []
         for x in driver.find_elements(By.XPATH, xpath_imdb_elements):
+                title_elem = x.find_element(By.XPATH, xpath_title)
                 data = {}
-                data["id"] =  f"o{x.find_element(By.XPATH, xpath_title).get_property('href').split('/')[4]}"
+                data["id"] =  f"o{title_elem.get_property('href').split('/')[4]}"
                 data["type"] = 'movie' if len(x.find_elements(By.XPATH, xpath_type))==0 else 'series'
-                data['poster'] = METAHUB_URL.format(x.find_element(By.XPATH, xpath_title).get_property("href").split("/")[4])
-                data['name'] = x.find_element(By.XPATH, ".//*[@class='ipc-title__text ipc-title__text--reduced']").text.split(". ",1)[1]
+                data['poster'] = METAHUB_URL.format(title_elem.get_property("href").split("/")[4])
+                data['name'] = title_elem.text.lstrip('0123456789. ')
                 if len(x.find_elements(By.XPATH, ".//div/div/div[2]/div/span[1]")) > 0:
                     data['releaseInfo'] = x.find_element(By.XPATH, ".//div/div/div[2]/div/span[1]").text
                 else:
@@ -82,15 +78,14 @@ def get_imdb_titles(url, loop=40):
 def get_imdb_full(url, year_step=2):
     with webdriver.Chrome() as driver:
         imdb_full = []
-        for year in range(1990, 2025, year_step):
+        for year in range(1990, 2026, year_step):
             driver.get(url+year_filter.format(year, year+year_step-1))
             actions = ActionChains(driver)
 
             xpath_next = "//span[@class='ipc-see-more__text']"
             xpath_imdb_elements = "//*[@class='ipc-metadata-list-summary-item__tc']"
-            xpath_title = ".//*[@class='ipc-lockup-overlay ipc-focusable']"
+            xpath_title = ".//a[contains(@href, '/title/')]"
             xpath_type = ".//span[contains(text(), 'TV Series')]"
-
             while True:
             #for i in range(5):
                 try:
@@ -104,11 +99,12 @@ def get_imdb_full(url, year_step=2):
                 next_ele = WebDriverWait(driver, waitS).until(EC.presence_of_element_located((By.XPATH, xpath_next)))
                 next_ele.click()
             for x in driver.find_elements(By.XPATH, xpath_imdb_elements):
+                title_elem = x.find_element(By.XPATH, xpath_title)
                 data = {}
-                data["id"] =  f"o{x.find_element(By.XPATH, xpath_title).get_property('href').split('/')[4]}"
-
+                data["id"] =  f"o{title_elem.get_property('href').split('/')[4]}"
                 data["type"] = 'movie' if len(x.find_elements(By.XPATH, xpath_type))==0 else 'series'
-                data['name'] = x.find_element(By.XPATH, ".//*[@class='ipc-title__text ipc-title__text--reduced']").text.split(". ",1)[1]
+                data['poster'] = METAHUB_URL.format(title_elem.get_property("href").split("/")[4])
+                data['name'] = title_elem.text.lstrip('0123456789. ')
                 if len(x.find_elements(By.XPATH, ".//div/div/div[2]/div/span[1]")) > 0:
                     data['releaseInfo'] = x.find_element(By.XPATH, ".//div/div/div[2]/div/span[1]").text
                 else:

@@ -27,7 +27,7 @@ def get_imdb_titles(url, loop=40):
 
         xpath_next = "//span[@class='ipc-see-more__text']"
         xpath_imdb_elements = "//*[@class='ipc-metadata-list-summary-item__tc']"
-        xpath_title = ".//a[contains(@href, '/title/')]"
+        xpath_title = ".//a[contains(@href, 'ref_=sr_t_')]"
         xpath_type = ".//span[contains(text(), 'TV Series')]"  # Keep for now
 
         for i in range(loop):
@@ -51,12 +51,12 @@ def get_imdb_titles(url, loop=40):
                 data["type"] = 'movie' if len(x.find_elements(By.XPATH, xpath_type))==0 else 'series'
                 data['poster'] = METAHUB_URL.format(title_elem.get_property("href").split("/")[4])
                 data['name'] = title_elem.text.lstrip('0123456789. ')
-                if len(x.find_elements(By.XPATH, ".//div/div/div[2]/div/span[1]")) > 0:
-                    data['releaseInfo'] = x.find_element(By.XPATH, ".//div/div/div[2]/div/span[1]").text
+                if len(x.find_elements(By.XPATH, ".//div/div[2]/div/span[1]")) > 0:
+                    data['releaseInfo'] = x.find_element(By.XPATH, ".//div/div[2]/div/span[1]").text
                 else:
                     data['releaseInfo'] = '0'
-                if len(x.find_elements(By.XPATH, ".//div/div/div[2]/div/span[2]")) > 0:
-                    data['runtime'] = x.find_element(By.XPATH, ".//div/div/div[2]/div/span[2]").text
+                if len(x.find_elements(By.XPATH, ".//div/div[2]/div/span[2]")) > 0:
+                    data['runtime'] = x.find_element(By.XPATH, ".//div/div[2]/div/span[2]").text
                 else:
                     data['runtime'] = '0h 0m'
                 if len(x.find_elements(By.XPATH, ".//*[@class='ipc-rating-star--rating']")) > 0:
@@ -84,7 +84,7 @@ def get_imdb_full(url, year_step=2):
 
             xpath_next = "//span[@class='ipc-see-more__text']"
             xpath_imdb_elements = "//*[@class='ipc-metadata-list-summary-item__tc']"
-            xpath_title = ".//a[contains(@href, '/title/')]"
+            xpath_title = ".//a[contains(@href, 'ref_=sr_t_')]"
             xpath_type = ".//span[contains(text(), 'TV Series')]"
             while True:
             #for i in range(5):
@@ -105,12 +105,12 @@ def get_imdb_full(url, year_step=2):
                 data["type"] = 'movie' if len(x.find_elements(By.XPATH, xpath_type))==0 else 'series'
                 data['poster'] = METAHUB_URL.format(title_elem.get_property("href").split("/")[4])
                 data['name'] = title_elem.text.lstrip('0123456789. ')
-                if len(x.find_elements(By.XPATH, ".//div/div/div[2]/div/span[1]")) > 0:
-                    data['releaseInfo'] = x.find_element(By.XPATH, ".//div/div/div[2]/div/span[1]").text
+                if len(x.find_elements(By.XPATH, ".//div/div[2]/div/span[1]")) > 0:
+                    data['releaseInfo'] = x.find_element(By.XPATH, ".//div/div[2]/div/span[1]").text
                 else:
                     data['releaseInfo'] = '0'
-                if len(x.find_elements(By.XPATH, ".//div/div/div[2]/div/span[2]")) > 0:
-                    data['runtime'] = x.find_element(By.XPATH, ".//div/div/div[2]/div/span[2]").text
+                if len(x.find_elements(By.XPATH, ".//div/div[2]/div/span[2]")) > 0:
+                    data['runtime'] = x.find_element(By.XPATH, ".//div/div[2]/div/span[2]").text
                 else:
                     data['runtime'] = '0h 0m'
                 if len(x.find_elements(By.XPATH, ".//*[@class='ipc-rating-star--rating']")) > 0:

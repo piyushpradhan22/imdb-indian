@@ -47,7 +47,7 @@ def get_imdb_titles(url, loop=40):
         for x in driver.find_elements(By.XPATH, xpath_imdb_elements):
                 title_elem = x.find_element(By.XPATH, xpath_title)
                 data = {}
-                data["id"] =  f"o{title_elem.get_property('href').split('/')[4]}"
+                data["id"] =  f"{title_elem.get_property('href').split('/')[4]}"
                 data["type"] = 'movie' if len(x.find_elements(By.XPATH, xpath_type))==0 else 'series'
                 data['poster'] = METAHUB_URL.format(title_elem.get_property("href").split("/")[4])
                 data['name'] = title_elem.text.lstrip('0123456789. ')
@@ -101,7 +101,7 @@ def get_imdb_full(url, year_step=2):
             for x in driver.find_elements(By.XPATH, xpath_imdb_elements):
                 title_elem = x.find_element(By.XPATH, xpath_title)
                 data = {}
-                data["id"] =  f"o{title_elem.get_property('href').split('/')[4]}"
+                data["id"] =  f"{title_elem.get_property('href').split('/')[4]}"
                 data["type"] = 'movie' if len(x.find_elements(By.XPATH, xpath_type))==0 else 'series'
                 data['poster'] = METAHUB_URL.format(title_elem.get_property("href").split("/")[4])
                 data['name'] = title_elem.text.lstrip('0123456789. ')

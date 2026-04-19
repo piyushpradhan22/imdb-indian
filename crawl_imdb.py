@@ -51,14 +51,22 @@ def get_imdb_titles(url, loop=40):
                 data["type"] = 'movie' if len(x.find_elements(By.XPATH, xpath_type))==0 else 'series'
                 data['poster'] = METAHUB_URL.format(title_elem.get_property("href").split("/")[4])
                 data['name'] = title_elem.text.lstrip('0123456789. ')
-                if len(x.find_elements(By.XPATH, ".//div/div[2]/div/span[1]")) > 0:
-                    data['releaseInfo'] = x.find_element(By.XPATH, ".//div/div[2]/div/span[1]").text
-                else:
-                    data['releaseInfo'] = '0'
-                if len(x.find_elements(By.XPATH, ".//div/div[2]/div/span[2]")) > 0:
-                    data['runtime'] = x.find_element(By.XPATH, ".//div/div[2]/div/span[2]").text
-                else:
-                    data['runtime'] = '0h 0m'
+                
+                # Try multiple possible paths for releaseInfo and runtime
+                release_elem = None
+                runtime_elem = None
+                
+                # Try class-based selectors first
+                metadata_spans = x.find_elements(By.XPATH, ".//span[contains(@class, 'dli-title-metadata')]")
+                if len(metadata_spans) > 0:
+                    all_spans_in_metadata = metadata_spans[0].find_elements(By.TAG_NAME, 'span')
+                    if len(all_spans_in_metadata) >= 1:
+                        release_elem = all_spans_in_metadata[0]
+                    if len(all_spans_in_metadata) >= 2:
+                        runtime_elem = all_spans_in_metadata[1]
+                
+                data['releaseInfo'] = release_elem.text if release_elem else '0'
+                data['runtime'] = runtime_elem.text if runtime_elem else '0h 0m'
                 if len(x.find_elements(By.XPATH, ".//*[@class='ipc-rating-star--rating']")) > 0:
                     data['imdbRating'] = x.find_element(By.XPATH, ".//*[@class='ipc-rating-star--rating']").text
                 else:
@@ -105,14 +113,22 @@ def get_imdb_full(url, year_step=2):
                 data["type"] = 'movie' if len(x.find_elements(By.XPATH, xpath_type))==0 else 'series'
                 data['poster'] = METAHUB_URL.format(title_elem.get_property("href").split("/")[4])
                 data['name'] = title_elem.text.lstrip('0123456789. ')
-                if len(x.find_elements(By.XPATH, ".//div/div[2]/div/span[1]")) > 0:
-                    data['releaseInfo'] = x.find_element(By.XPATH, ".//div/div[2]/div/span[1]").text
-                else:
-                    data['releaseInfo'] = '0'
-                if len(x.find_elements(By.XPATH, ".//div/div[2]/div/span[2]")) > 0:
-                    data['runtime'] = x.find_element(By.XPATH, ".//div/div[2]/div/span[2]").text
-                else:
-                    data['runtime'] = '0h 0m'
+                
+                # Try multiple possible paths for releaseInfo and runtime
+                release_elem = None
+                runtime_elem = None
+                
+                # Try class-based selectors first
+                metadata_spans = x.find_elements(By.XPATH, ".//span[contains(@class, 'dli-title-metadata')]")
+                if len(metadata_spans) > 0:
+                    all_spans_in_metadata = metadata_spans[0].find_elements(By.TAG_NAME, 'span')
+                    if len(all_spans_in_metadata) >= 1:
+                        release_elem = all_spans_in_metadata[0]
+                    if len(all_spans_in_metadata) >= 2:
+                        runtime_elem = all_spans_in_metadata[1]
+                
+                data['releaseInfo'] = release_elem.text if release_elem else '0'
+                data['runtime'] = runtime_elem.text if runtime_elem else '0h 0m'
                 if len(x.find_elements(By.XPATH, ".//*[@class='ipc-rating-star--rating']")) > 0:
                     data['imdbRating'] = x.find_element(By.XPATH, ".//*[@class='ipc-rating-star--rating']").text
                 else:

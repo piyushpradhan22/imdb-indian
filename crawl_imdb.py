@@ -8,7 +8,7 @@ from concurrent import futures
 
 METAHUB_URL = 'https://images.metahub.space/poster/medium/{}/img'
 
-waitS = 5
+waitS = 3
 
 options = webdriver.ChromeOptions()
 options.add_argument('--no-sandbox')
@@ -24,7 +24,7 @@ def get_imdb_titles(url, loop=40):
     with webdriver.Chrome() as driver:
         driver.get(url)
         actions = ActionChains(driver)
-
+        
         xpath_next = "//span[@class='ipc-see-more__text']"
         xpath_imdb_elements = "//*[@class='ipc-metadata-list-summary-item__tc']"
         xpath_title = ".//a[contains(@href, 'ref_=sr_t_')]"
@@ -48,6 +48,7 @@ def get_imdb_titles(url, loop=40):
                 title_elem = x.find_element(By.XPATH, xpath_title)
                 data = {}
                 data["id"] =  f"{title_elem.get_property('href').split('/')[4]}"
+                
                 data["type"] = 'movie' if len(x.find_elements(By.XPATH, xpath_type))==0 else 'series'
                 data['poster'] = METAHUB_URL.format(title_elem.get_property("href").split("/")[4])
                 data['name'] = title_elem.text.lstrip('0123456789. ')
@@ -56,14 +57,19 @@ def get_imdb_titles(url, loop=40):
                 release_elem = None
                 runtime_elem = None
                 
-                # Try class-based selectors first
-                metadata_spans = x.find_elements(By.XPATH, ".//span[contains(@class, 'dli-title-metadata')]")
-                if len(metadata_spans) > 0:
-                    all_spans_in_metadata = metadata_spans[0].find_elements(By.TAG_NAME, 'span')
-                    if len(all_spans_in_metadata) >= 1:
-                        release_elem = all_spans_in_metadata[0]
-                    if len(all_spans_in_metadata) >= 2:
-                        runtime_elem = all_spans_in_metadata[1]
+                # Use optimized XPath with text pattern matching
+                # Look for spans containing 4-digit years (19xx or 20xx)
+                release_candidates = x.find_elements(By.XPATH, ".//span[text() >= '1900' and text() <= '2030' and string-length(text()) = 4]")
+                if release_candidates:
+                    release_elem = release_candidates[0]
+                
+                # Look for spans containing duration patterns (digits + h/m)
+                runtime_candidates = x.find_elements(By.XPATH, ".//span[contains(text(), 'h') or contains(text(), 'm')]")
+                for candidate in runtime_candidates:
+                    text = candidate.text.strip()
+                    if any(char.isdigit() for char in text) and (('h' in text.lower()) or ('m' in text.lower())):
+                        runtime_elem = candidate
+                        break
                 
                 data['releaseInfo'] = release_elem.text if release_elem else '0'
                 data['runtime'] = runtime_elem.text if runtime_elem else '0h 0m'
@@ -118,14 +124,19 @@ def get_imdb_full(url, year_step=2):
                 release_elem = None
                 runtime_elem = None
                 
-                # Try class-based selectors first
-                metadata_spans = x.find_elements(By.XPATH, ".//span[contains(@class, 'dli-title-metadata')]")
-                if len(metadata_spans) > 0:
-                    all_spans_in_metadata = metadata_spans[0].find_elements(By.TAG_NAME, 'span')
-                    if len(all_spans_in_metadata) >= 1:
-                        release_elem = all_spans_in_metadata[0]
-                    if len(all_spans_in_metadata) >= 2:
-                        runtime_elem = all_spans_in_metadata[1]
+                # Use optimized XPath with text pattern matching
+                # Look for spans containing 4-digit years (19xx or 20xx)
+                release_candidates = x.find_elements(By.XPATH, ".//span[text() >= '1900' and text() <= '2099' and string-length(text()) = 4]")
+                if release_candidates:
+                    release_elem = release_candidates[0]
+                
+                # Look for spans containing duration patterns (digits + h/m)
+                runtime_candidates = x.find_elements(By.XPATH, ".//span[contains(text(), 'h') or contains(text(), 'm')]")
+                for candidate in runtime_candidates:
+                    text = candidate.text.strip()
+                    if any(char.isdigit() for char in text) and (('h' in text.lower()) or ('m' in text.lower())):
+                        runtime_elem = candidate
+                        break
                 
                 data['releaseInfo'] = release_elem.text if release_elem else '0'
                 data['runtime'] = runtime_elem.text if runtime_elem else '0h 0m'

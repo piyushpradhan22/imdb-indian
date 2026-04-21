@@ -6,7 +6,11 @@ from concurrent.futures import ThreadPoolExecutor
 
 def YoutubeSearch(query, max_results=5):
     url = f"https://www.youtube.com/results?search_query={query.replace(' ', '+')}"
-    response = requests.get(url)
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+        "Accept-Language": "en-US,en;q=0.9",
+    }
+    response = requests.get(url, headers=headers)
     response.raise_for_status()
 
     soup = BeautifulSoup(response.text, "lxml")
@@ -54,8 +58,13 @@ def YoutubeSearch(query, max_results=5):
 
     return results
 
+import time
+
 def get_youtube_info(x):
-    query = f"{x.get('name')} {x.get('year')[:4]} trailer hindi"
+    time.sleep(1) # Add a small delay to avoid rate limiting
+    year_info = x.get('releaseInfo') or x.get('year') or ''
+    year_str = year_info[:4] if year_info else ''
+    query = f"{x.get('name', '')} {year_str} trailer hindi".strip()
     result = YoutubeSearch(query, max_results=1)
     
     if result:
@@ -74,7 +83,8 @@ def update_data_with_youtube_links():
     # Create new dictionary structure
     youtube_data = {}
     
-    with ThreadPoolExecutor() as executor:
+    # Limit workers to avoid triggering YouTube's anti-bot protection
+    with ThreadPoolExecutor(max_workers=5) as executor:
         for keys in data.keys():
             # Process movies and get YouTube info
             updated_movies = list(executor.map(get_youtube_info, data[keys]))

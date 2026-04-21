@@ -57,19 +57,21 @@ def get_imdb_titles(url, loop=40):
                 release_elem = None
                 runtime_elem = None
                 
-                # Use optimized XPath with text pattern matching
-                # Look for spans containing 4-digit years (19xx or 20xx)
-                release_candidates = x.find_elements(By.XPATH, ".//span[text() >= '1900' and text() <= '2030' and string-length(text()) = 4]")
-                if release_candidates:
-                    release_elem = release_candidates[0]
                 
-                # Look for spans containing duration patterns (digits + h/m)
-                runtime_candidates = x.find_elements(By.XPATH, ".//span[contains(text(), 'h') or contains(text(), 'm')]")
-                for candidate in runtime_candidates:
-                    text = candidate.text.strip()
-                    if any(char.isdigit() for char in text) and (('h' in text.lower()) or ('m' in text.lower())):
-                        runtime_elem = candidate
-                        break
+                # IMDb now uses li elements with class ipc-inline-list__item for metadata
+                metadata_items = x.find_elements(By.XPATH, ".//li[contains(@class, 'ipc-inline-list__item')]")
+                
+                for item in metadata_items:
+                    text = item.text.strip()
+                    
+                    # Check for release year
+                    if not release_elem and len(text) >= 4 and text[:4].isdigit() and 1800 <= int(text[:4]) <= 2100:
+                        release_elem = item
+                        
+                    # Check for runtime (contains digits and 'h' or 'm', usually like '2h 15m')
+                    elif not runtime_elem and len(text) <= 15 and any(char.isdigit() for char in text) and ('h' in text.lower() or 'm' in text.lower()):
+                        if '$' not in text:
+                            runtime_elem = item
                 
                 data['releaseInfo'] = release_elem.text if release_elem else '0'
                 data['runtime'] = runtime_elem.text if runtime_elem else '0h 0m'
@@ -124,19 +126,21 @@ def get_imdb_full(url, year_step=2):
                 release_elem = None
                 runtime_elem = None
                 
-                # Use optimized XPath with text pattern matching
-                # Look for spans containing 4-digit years (19xx or 20xx)
-                release_candidates = x.find_elements(By.XPATH, ".//span[text() >= '1900' and text() <= '2099' and string-length(text()) = 4]")
-                if release_candidates:
-                    release_elem = release_candidates[0]
                 
-                # Look for spans containing duration patterns (digits + h/m)
-                runtime_candidates = x.find_elements(By.XPATH, ".//span[contains(text(), 'h') or contains(text(), 'm')]")
-                for candidate in runtime_candidates:
-                    text = candidate.text.strip()
-                    if any(char.isdigit() for char in text) and (('h' in text.lower()) or ('m' in text.lower())):
-                        runtime_elem = candidate
-                        break
+                # IMDb now uses li elements with class ipc-inline-list__item for metadata
+                metadata_items = x.find_elements(By.XPATH, ".//li[contains(@class, 'ipc-inline-list__item')]")
+                
+                for item in metadata_items:
+                    text = item.text.strip()
+                    
+                    # Check for release year
+                    if not release_elem and len(text) >= 4 and text[:4].isdigit() and 1800 <= int(text[:4]) <= 2100:
+                        release_elem = item
+                        
+                    # Check for runtime (contains digits and 'h' or 'm', usually like '2h 15m')
+                    elif not runtime_elem and len(text) <= 15 and any(char.isdigit() for char in text) and ('h' in text.lower() or 'm' in text.lower()):
+                        if '$' not in text:
+                            runtime_elem = item
                 
                 data['releaseInfo'] = release_elem.text if release_elem else '0'
                 data['runtime'] = runtime_elem.text if runtime_elem else '0h 0m'

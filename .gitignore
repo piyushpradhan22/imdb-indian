@@ -2,3 +2,4 @@ yt_meta.json
 data.json
 scraper/
 __pycache__
+.vscode/

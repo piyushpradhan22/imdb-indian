@@ -28,7 +28,7 @@ def get_imdb_titles(url, loop=40):
         xpath_next = "//span[@class='ipc-see-more__text']"
         xpath_imdb_elements = "//*[@class='ipc-metadata-list-summary-item__tc']"
         xpath_title = ".//a[contains(@href, 'ref_=sr_t_')]"
-        xpath_type = ".//span[contains(text(), 'TV Series')]"  # Keep for now
+        xpath_type = ".//li[contains(@class, 'ipc-inline-list__item') and (contains(text(), 'TV Series') or contains(text(), 'TV Mini Series') or contains(text(), 'TV Special') or contains(text(), 'TV series') or contains(text(), 'Mini-Series'))]"  # Enhanced to catch more TV types
 
         for i in range(loop):
 
@@ -101,7 +101,7 @@ def get_imdb_full(url, year_step=2):
             xpath_next = "//span[@class='ipc-see-more__text']"
             xpath_imdb_elements = "//*[@class='ipc-metadata-list-summary-item__tc']"
             xpath_title = ".//a[contains(@href, 'ref_=sr_t_')]"
-            xpath_type = ".//span[contains(text(), 'TV Series')]"
+            xpath_type = ".//li[contains(@class, 'ipc-inline-list__item') and (contains(text(), 'TV Series') or contains(text(), 'TV Mini Series') or contains(text(), 'TV Special') or contains(text(), 'TV series') or contains(text(), 'Mini-Series'))]"
             while True:
             #for i in range(5):
                 try:

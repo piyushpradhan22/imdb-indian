@@ -14,7 +14,7 @@ try:
 except Exception as e:
     print(f"QB request failed: {e}")
 try:
-    res = requests.get("https://guzowskilynottmvvy49011733757114-ptn.hf.space").json()
-    print("PTN is running Well", res)
+    requests.get("https://guzowskilynottmvvy49011733757114-ptn.hf.space").json()
+    print("PTN is running Well")
 except Exception as e:
     print(f"PTN request failed: {e}")

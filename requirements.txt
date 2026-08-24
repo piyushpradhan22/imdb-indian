@@ -1,4 +1,4 @@
-selenium
+selenium>=4.15
 requests
 beautifulsoup4
 lxml

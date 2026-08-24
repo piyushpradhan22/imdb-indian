@@ -4,32 +4,57 @@ on:
   schedule:
     - cron: "0 0 */7 * *"
   workflow_dispatch:
+    inputs:
+      test_mode:
+        description: "Run a fast, limited test crawl (writes data.test.json, no commit)"
+        type: boolean
+        default: false
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     timeout-minutes: 200
     steps:
-        
+
       - name: checkout repo content
-        uses: actions/checkout@v2 # checkout the repository content to github runner
+        uses: actions/checkout@v4 # checkout the repository content to github runner
 
       - name: setup python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.9' # install the python version needed
-          
+          python-version: '3.11' # install the python version needed
+
+      - name: setup Chrome
+        uses: browser-actions/setup-chrome@v1
+        with:
+          install-chromedriver: true
+
       - name: install python packages
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          
-      - name: execute py script # run main.py
-        run: python -u crawl_imdb.py
-        
+
+      - name: install Xvfb
+        run: sudo apt-get update && sudo apt-get install -y xvfb
+
+      - name: execute py script # run headful Chrome under a virtual display
+        env:
+          CRAWL_TEST_MODE: ${{ inputs.test_mode && '1' || '' }}
+        run: xvfb-run -a python -u crawl_imdb.py
+
       - name: Commit Data from IMDB
+        if: ${{ !inputs.test_mode }} # skip committing on test runs
         run: |
           git config --global user.name 'Piyush Pradhan'
           git config --global user.email 'piyushpradhan22@users.noreply.github.com'
           git commit -am "Automated IMDB Data Update"
           git push
+
+      - name: Upload test artifact
+        if: ${{ inputs.test_mode }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: crawl-test-output
+          path: |
+            data.test.json
+            crawl_imdb.log

@@ -1,5 +1,7 @@
 yt_meta.json
 data.json
+data.test.json
+crawl_imdb.log
 scraper/
 __pycache__
 .vscode/

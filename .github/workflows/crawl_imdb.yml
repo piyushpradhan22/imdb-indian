@@ -28,8 +28,7 @@ jobs:
 
       - name: setup Chrome
         uses: browser-actions/setup-chrome@v1
-        with:
-          install-chromedriver: true
+        # No chromedriver here: Selenium Manager downloads the one matching Chrome.
 
       - name: install python packages
         run: |

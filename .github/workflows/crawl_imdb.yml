@@ -14,6 +14,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 200
+    permissions:
+      contents: write # allow the workflow to push the data update
     steps:
 
       - name: checkout repo content
@@ -47,11 +49,12 @@ jobs:
         run: |
           git config --global user.name 'Piyush Pradhan'
           git config --global user.email 'piyushpradhan22@users.noreply.github.com'
-          git commit -am "Automated IMDB Data Update"
+          git add -A
+          git commit -m "Automated IMDB Data Update" || echo "No changes to commit"
           git push
 
       - name: Upload test artifact
-        if: ${{ inputs.test_mode }}
+        if: ${{ always() && inputs.test_mode }}
         uses: actions/upload-artifact@v4
         with:
           name: crawl-test-output

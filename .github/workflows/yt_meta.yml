@@ -1,13 +1,14 @@
 name: YouTube Metadata Update
 
+# Disabled: automatic trigger removed. Manual-only via workflow_dispatch.
 on:
   workflow_dispatch:  # Manual trigger
-  workflow_run:
-    workflows: ["Pull from imdb"]
-    types:
-      - completed
-    branches:
-      - master
+  # workflow_run:
+  #   workflows: ["Pull from imdb"]
+  #   types:
+  #     - completed
+  #   branches:
+  #     - master
 
 jobs:
   update-yt-metadata:

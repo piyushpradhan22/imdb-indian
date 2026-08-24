@@ -325,9 +325,34 @@ for i in range(len(title_res)):
     imdb_dict[types[i]] = title_res[i]
 
 out_file = 'data.test.json' if TEST_MODE else 'data.json'
-with open(out_file, 'w') as f:
-    json.dump(imdb_dict | full_imdb_dict, f)
+combined = imdb_dict | full_imdb_dict
 
-log.info('Wrote %s (%d title sections, %d full sections)',
-         out_file, len(imdb_dict), len(full_imdb_dict))
+# Refuse to overwrite good data with an empty/blocked scrape.
+empty_sections = [k for k, v in combined.items() if not v]
+new_total = sum(len(v) for v in combined.values())
+if empty_sections or new_total == 0:
+    log.error('Not writing %s: empty sections=%s, total items=%d (keeping existing file)',
+              out_file, empty_sections, new_total)
+    raise SystemExit(1)
+
+# Guard against a partial scrape that is far smaller than the last good run.
+if os.path.exists(out_file):
+    try:
+        with open(out_file) as f:
+            old_total = sum(len(v) for v in json.load(f).values())
+    except Exception:
+        old_total = 0
+    if old_total and new_total < old_total * 0.5:
+        log.error('Not writing %s: new total %d < 50%% of existing %d (keeping existing file)',
+                  out_file, new_total, old_total)
+        raise SystemExit(1)
+
+# Atomic write so a crash mid-write cannot corrupt the existing file.
+tmp_file = out_file + '.tmp'
+with open(tmp_file, 'w') as f:
+    json.dump(combined, f)
+os.replace(tmp_file, out_file)
+
+log.info('Wrote %s (%d title sections, %d full sections, %d items)',
+         out_file, len(imdb_dict), len(full_imdb_dict), new_total)
 log.info('=== Completed ===')

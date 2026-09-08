@@ -26,6 +26,10 @@ METAHUB_URL = 'https://images.metahub.space/poster/medium/{}/img'
 
 waitS = 3
 
+# How many times to re-check for the "see more" button before treating its
+# absence as the genuine end of the list (guards against transient timeouts).
+SEE_MORE_RETRIES = 3
+
 VERIFICATION_MARKERS = ('verify you are human', 'human verification', 'captcha', '403 forbidden')
 
 # Test mode: fewer pages/years/sections so a run finishes in a minute or two.
@@ -127,13 +131,26 @@ def get_imdb_titles(url, loop=40):
         xpath_title = ".//a[contains(@href, 'ref_=sr_t_')]"
         xpath_type = ".//li[contains(@class, 'ipc-inline-list__item') and (contains(text(), 'TV Series') or contains(text(), 'TV Mini Series') or contains(text(), 'TV Special') or contains(text(), 'TV series') or contains(text(), 'Mini-Series'))]"  # Enhanced to catch more TV types
 
+        # Wait for the first page of results before paginating, so a slow initial
+        # render (common with 4 headful Chromes under Xvfb) isn't mistaken for "no results".
+        try:
+            WebDriverWait(driver, 30).until(EC.presence_of_element_located((By.XPATH, xpath_imdb_elements)))
+        except Exception:
+            log.warning('Results list never appeared for url=%s', url)
+
         for i in range(loop):
 
-            try:
-                WebDriverWait(driver, waitS).until(EC.presence_of_element_located((By.XPATH, xpath_next)))
-            except:
-                driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-                log.info('No more "see more" after %d clicks for url=%s', i, url)
+            # Retry before giving up: a transient timeout (button not rendered yet)
+            # must not be mistaken for the genuine end of the list.
+            for attempt in range(SEE_MORE_RETRIES):
+                try:
+                    WebDriverWait(driver, waitS).until(EC.presence_of_element_located((By.XPATH, xpath_next)))
+                    break
+                except Exception:
+                    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            else:
+                log.info('No more "see more" after %d clicks (%d retries) for url=%s',
+                         i, SEE_MORE_RETRIES, url)
                 break
 
             next_ele = WebDriverWait(driver, waitS).until(EC.presence_of_element_located((By.XPATH, xpath_next)))
@@ -212,15 +229,26 @@ def get_imdb_full(url, year_step=2):
             xpath_imdb_elements = "//*[@class='ipc-metadata-list-summary-item__tc']"
             xpath_title = ".//a[contains(@href, 'ref_=sr_t_')]"
             xpath_type = ".//li[contains(@class, 'ipc-inline-list__item') and (contains(text(), 'TV Series') or contains(text(), 'TV Mini Series') or contains(text(), 'TV Special') or contains(text(), 'TV series') or contains(text(), 'Mini-Series'))]"
+
+            # Wait for the first page before paginating so a slow render isn't read as "empty".
+            try:
+                WebDriverWait(driver, 30).until(EC.presence_of_element_located((By.XPATH, xpath_imdb_elements)))
+            except Exception:
+                log.warning('Results list never appeared for url=%s', year_url)
+
             clicks = 0
             while True:
             #for i in range(5):
                 if TEST_MODE and clicks >= TEST_MAX_CLICKS:
                     break
-                try:
-                    WebDriverWait(driver, waitS).until(EC.presence_of_element_located((By.XPATH, xpath_next)))
-                except:
-                    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                # Retry so a transient timeout isn't mistaken for the end of the year's list.
+                for attempt in range(SEE_MORE_RETRIES):
+                    try:
+                        WebDriverWait(driver, waitS).until(EC.presence_of_element_located((By.XPATH, xpath_next)))
+                        break
+                    except Exception:
+                        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                else:
                     break
 
                 next_ele = WebDriverWait(driver, waitS).until(EC.presence_of_element_located((By.XPATH, xpath_next)))

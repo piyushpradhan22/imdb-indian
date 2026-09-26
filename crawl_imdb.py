@@ -329,8 +329,6 @@ imdb_titles = {
                 'Series' : "https://www.imdb.com/search/title/?title_type=tv_series&country_of_origin=IN",
                 'Netflix India' : "https://www.imdb.com/search/title/?title_type=feature,tv_series&companies=co0944055",
                 'Prime Video' : "https://www.imdb.com/search/title/?title_type=feature,tv_series&companies=co0939864",
-                "Disney Plus Hotstar" : "https://www.imdb.com/search/title/?title_type=feature,tv_series&companies=co0847080",
-                'Jio Cinema' : "https://www.imdb.com/search/title/?title_type=feature,tv_series&companies=co0808044",
                 'Jio Hotstar' : "https://www.imdb.com/search/title/?title_type=feature,tv_series&companies=co1113006",
                 'Zee5' : 'https://www.imdb.com/search/title/?title_type=feature,tv_series&companies=co0692549',
                 'Sony Liv' : 'https://www.imdb.com/search/title/?title_type=feature,tv_series&companies=co0546496'
